@@ -1,7 +1,7 @@
 {
   "name": "vue-sweets",
   "main": "lib/index.umd.min.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "vue",
   "keywords": [
     "vue",
