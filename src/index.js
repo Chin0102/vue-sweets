@@ -5,10 +5,6 @@ import localJson from './local-json'
 import * as types from './utils/types'
 import forceInterval from './utils/force-interval'
 
-let isRouterView = i => {
-	return i && (i = i.$options) && (i = i._parentVnode) && (i = i.data) && i.routerView
-}
-
 export default {
 	types, forceInterval,
 	service,
@@ -28,21 +24,9 @@ export default {
 
 		Vue.mixin({
 			methods: {
-				/**
-				 * return a function wait to call, and then return axios()
-				 * @param api=String//`${service}/${api}`
-				 * @param args=Any//api.params
-				 * @returns {Function}
-				 */
 				$api(api, ...args) {
 					return service.api(this, api, ...args)
 				},
-				/**
-				 * return axios()
-				 * @param api=String//`${service}/${api}`
-				 * @param args=Any//api.params
-				 * @returns {Promise}
-				 */
 				$invoke(api, ...args) {
 					return service.invoke(this, api, ...args)
 				}
@@ -59,15 +43,18 @@ export default {
 						})
 				}
 			},
-			mounted() {
-				if (isRouterView(this)) {
-					if (!this.queryConverter) this.queryConverter = {}
-					if (!this.query) this.query = {}
-					query.setCurrentPage(this)
-				}
+			beforeRouteEnter(to, from, next) {
+				next(vm => {
+					if (!vm.queryConverter) vm.queryConverter = {}
+					if (!vm.query) vm.query = {}
+					query.setCurrentPage(vm)
+				})
+			},
+			beforeRouteLeave(to, from, next) {
+				query.setCurrentPage(null)
+				next()
 			},
 			beforeDestroy() {
-				if (isRouterView(this)) query.setCurrentPage(null)
 				if (this._globalEventHandlers) Object.entries(this._globalEventHandlers)
 					.forEach(([event, handler]) => dispatcher.$off(event, handler))
 			}
