@@ -103,8 +103,8 @@ export default {
 		if (!vm) return query = null
 		let deep = vm.$options._parentVnode.data.routerViewDepth
 		if (query && query.deep > deep) return
-		query = new Query(vm, deep)
-		vm.$nextTick(() => query.handleRouteChange())
+		let q = query = new Query(vm, deep)
+		vm.$nextTick(() => q.handleRouteChange())
 	},
 	public: {
 		converter,
