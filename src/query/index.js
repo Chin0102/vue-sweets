@@ -21,19 +21,18 @@ const converters = {
 	},
 	Array: {
 		toModel(str) {
-			return str.split(',')
+			return str === '' ? [] : str.split(',')
 		},
 		toQueryString(arr) {
-			if (arr) return arr.join(',')
-			return ''
+			return arr ? arr.join(',') : ''
 		}
 	},
 	NumberArray: {
 		toModel(str) {
-			return str.split(',').map(s => parseFloat(s))
+			return str === '' ? [] : str.split(',').map(s => parseFloat(s))
 		},
 		toQueryString(arr) {
-			return arr.join(',')
+			return arr ? arr.join(',') : ''
 		}
 	}
 }
@@ -41,9 +40,12 @@ const converter = new Proxy({}, {
 	get: (_, name) => converters[name]
 })
 
+const trim = str => str.replace(/(^\s*)|(\s*$)/g, '')
+
 class Query {
 	constructor(ins, deep) {
 		this._default = {}
+		this._defaultQS = {}
 		this.ins = ins
 		this.deep = deep
 		let conv = ins.queryConverter
@@ -55,6 +57,7 @@ class Query {
 			}
 			if (isNumber(value) && isNaN(value)) value = ins.query[key] = ''
 			this._default[key] = value
+			this._defaultQS[key] = conv.hasOwnProperty(key) ? conv[key].toQueryString(value) : value
 		})
 	}
 
@@ -62,7 +65,7 @@ class Query {
 		let _this = this.ins
 		let query = {}, conv = _this.queryConverter
 		Object.entries(_this.$route.query).forEach(([key, value]) => {
-			value = value.replace(/(^\s*)|(\s*$)/g, '')
+			value = trim(value)
 			if (conv.hasOwnProperty(key)) value = conv[key].toModel(value)
 			query[key] = value
 		})
@@ -71,19 +74,27 @@ class Query {
 	}
 
 	locateOrigin() {
-		let _this = this.ins
-		Object.assign(_this.query, this._default)
-		this.locate()
+		this.locateByQS()
 	}
 
 	locate() {
+		this.locateByModel(this.ins.query)
+	}
+
+	locateByModel(model) {
 		let _this = this.ins
-		if (_this.$options.$beforeLocate) _this.$options.$beforeLocate.bind(_this)(_this.query, _this.$route.params)
+		if (_this.$options.$beforeLocate) _this.$options.$beforeLocate.bind(_this)(model, _this.$route.params)
 		let query = {}, conv = _this.queryConverter
-		Object.entries(_this.query).forEach(([key, value]) => {
+		Object.entries(model).forEach(([key, value]) => {
 			if (conv.hasOwnProperty(key)) value = conv[key].toQueryString(value)
-			if ((value || value === 0) && value !== '') query[key] = String(value).replace(/(^\s*)|(\s*$)/g, '')
+			if (isString(value) && value !== '') value = trim(value)
+			if (this._defaultQS[key] !== value) query[key] = value
 		})
+		this.locateByQS(query)
+	}
+
+	locateByQS(query) {
+		let _this = this.ins
 		_this.$router.push({path: _this.$route.path, query}).then(route => {
 			if (!route.path && !route.query) this.handleRouteChange()
 		})
@@ -116,6 +127,12 @@ export default {
 		},
 		locateOrigin() {
 			if (query) query.locateOrigin()
+		},
+		locateByModel(model) {
+			if (query) query.locateByModel(model)
+		},
+		locateByQS(qs) {
+			if (query) query.locateByQS(qs)
 		}
 	}
 }
