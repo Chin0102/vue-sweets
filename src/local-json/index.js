@@ -60,9 +60,9 @@ const localJsonCache = {}
 export default {
 	init(dispatcher) {
 		window.addEventListener('storage', (e) => {
-			let key = e.key
-			let item = this.get(key)
-			if (item) dispatcher.$emit('storage:' + key, item.reload())
+			let name = e.key
+			let localJson = localJsonCache[name]
+			if (localJson) dispatcher.$emit('storage:' + name, localJson.reload())
 		})
 	},
 	public(name, getDefValue = null) {
