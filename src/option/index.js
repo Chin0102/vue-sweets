@@ -16,25 +16,25 @@ const asyncMap = {}
 
 const add = (name, option, keys = null) => {
   keys = Object.assign({label: 'label', value: 'value'}, keys)
-  const format = createOptionsFormatter(option, keys)
-  const get = createOptionsGetter(option, keys.value)
-  const optionObj = {}
-  Object.defineProperty(optionObj, 'value', {get: () => option})
-  Object.defineProperty(optionObj, 'format', {get: () => format})
-  Object.defineProperty(optionObj, 'get', {get: () => get})
-  Object.defineProperty(optionObj, 'keys', {get: () => keys})
-  return map[name] = optionObj
+  let opt = {
+    keys, value: option,
+    format: createOptionsFormatter(option, keys),
+    get: createOptionsGetter(option, keys.value)
+  }
+  if (map[name]) Object.assign(map[name], opt)
+  else map[name] = opt
+  return map[name]
 }
 
 const asyncGet = name => {
   let asyncInfo = asyncMap[name]
   if (!asyncInfo || asyncInfo.status === 1) return
+  asyncInfo.status = 1
   let {prePromise, keys} = asyncInfo
   prePromise().then(option => {
     add(name, option, keys)
     delete asyncMap[name]
   })
-  asyncInfo.status = 1
 }
 
 export default {
