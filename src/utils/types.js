@@ -20,7 +20,7 @@ let isNumber = value => is(value, NUMBER)
 let isBoolean = value => is(value, BOOLEAN)
 
 export {
-	NULL, UNDEFINED, ARRAY, OBJECT, STRING, NUMBER, BOOLEAN,
-	type, is,
-	isNull, isUndefined, isValue, isArray, isObject, isFunction, isString, isNumber, isBoolean
+  NULL, UNDEFINED, ARRAY, OBJECT, STRING, NUMBER, BOOLEAN,
+  type, is,
+  isNull, isUndefined, isValue, isArray, isObject, isFunction, isString, isNumber, isBoolean
 }

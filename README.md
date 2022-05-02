@@ -62,6 +62,7 @@ $routeChanged(){
 ```
 
 ### service
+
 ```js
 sweets.service.add({
   name: 'service',
@@ -90,6 +91,7 @@ $api('service/detail', 1) //return function, and it return Promise
 ```
 
 ### localJson
+
 ```js
 let myLocalJson = localJson('PageData', ()=>({abc:123,ddd:'dd'}))
 let json = myLocalJson.json //first time = {abc:123,ddd:'dd'}
@@ -99,6 +101,7 @@ let json = myLocalJson.json //first time = {abc:123,ddd:'dd'}
 ```
 
 ### global event
+
 ```js
 $emitGlobal('resize')
 //vue $options function to listen
