@@ -101,26 +101,22 @@ class Query {
   }
 }
 
-let query, watchRoute
+let query
 
 export default {
-  setRootPage(vm) {
-    if (!watchRoute) {
-      watchRoute = true
-      vm.$watch('$route', () => query && query.handleRouteChange())
-    }
-  },
   setCurrentPage(vm) {
     if (!vm) return query = null
     let deep = vm.$options._parentVnode.data.routerViewDepth
     if (query && query.deep > deep) return
-    let q = query = new Query(vm, deep)
-    vm.$nextTick(() => q.handleRouteChange())
+    return query = new Query(vm, deep)
   },
   public: {
     converter,
     addConverter(type, toModel, toQueryString) {
       converters[type] = {toModel, toQueryString}
+    },
+    value() {
+      if (query) return query.ins.query
     },
     locate() {
       if (query) query.locate()

@@ -32,7 +32,6 @@ sweets.install = function (Vue, sweetsOptions) {
       }
     },
     created() {
-      query.setRootPage(this)
       let eventHandlers = this.$options.$eventHandlers
       if (eventHandlers) {
         this._globalEventHandlers = {}
@@ -43,11 +42,21 @@ sweets.install = function (Vue, sweetsOptions) {
           })
       }
     },
+    mounted() {
+      if (this.$options.$routeChanged) {
+        let handleRouteChange = () => {
+          if (this._query) this._query.handleRouteChange()
+          else this.$options.$routeChanged.bind(this)(this.$query.value(), this.$route.params)
+        }
+        this.$watch('$route', handleRouteChange)
+        this.$nextTick(handleRouteChange)
+      }
+    },
     beforeRouteEnter(to, from, next) {
       next(vm => {
         if (!vm.queryConverter) vm.queryConverter = {}
         if (!vm.query) vm.query = {}
-        query.setCurrentPage(vm)
+        vm._query = query.setCurrentPage(vm)
       })
     },
     beforeRouteLeave(to, from, next) {
