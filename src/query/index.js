@@ -3,10 +3,11 @@ import {isArray, isBoolean, isNumber, isString} from '../utils/types'
 const converters = {
   Number: {
     toModel(str) {
+      if (str === '') return str
       return parseFloat(str)
     },
     toQueryString(num) {
-      if (num !== 0 && !num) return NaN
+      if (num !== 0 && num !== '' && !num) return NaN
       return num.toString()
     }
   },
