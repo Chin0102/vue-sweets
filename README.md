@@ -14,7 +14,7 @@ Vue.use(sweets)
 //option static or async
 sweets.option.add('server', [
   {label: 'nodejs', value: 0},
-  {label: 'jave', value: 1},
+  {label: 'java', value: 1},
   {label: 'go', value: 2}
 ])
 sweets.option.addAsync('server', getServerType()) //getServerType return Promise
@@ -22,7 +22,7 @@ sweets.option.addAsync('server', getServerType()) //getServerType return Promise
 //template
 $option.server.value //get option: 'server', whatever static or async
 $option.server.get(0) // { label:'nodejs', value: 0}
-$option.server.format(1) // 'jave'
+$option.server.format(1) // 'java'
 ```
 
 ### query
@@ -147,4 +147,4 @@ $eventHandlers:{
 
 - Vue $options
   - $eventHandlers: Object //listen global event
-  - $routeChanged: Function //on route changed, route view only
+  - $routeChanged: Function //on route changed
